@@ -1,0 +1,103 @@
+library(ggplot2)
+library(hrbrthemes)
+
+data <- read.delim('clipboard')
+head(data)
+regresi <- lm(y~x1+x2, data)
+
+#menghitung persamaan regresi
+regresi <- lm(y~x1+x2)
+summary(regresi)
+residual <- resid(regresi)
+
+# Uji kolmogrov
+x<-residual
+x<-as.data.frame(diff(x)/x[-length(x)])
+names(x)<-"r"
+ks.test(x$r, "pnorm", mean=mean(x$r), sd=sd(x$r))
+
+qqnorm(residual)
+qqline(residual)
+
+# Membuat Histogram
+hist(residual, main='Histogram Sisaan', xlab='Residual', xlim=c(-15,15), col ='darkmagenta', freq =T)
+xfit=seq(min(residual), max(residual), length=40)  
+Z <- hist(residual)
+Z$breaks 
+Z$counts
+Z$density
+Z$mids
+Z$xname
+Z$equidist
+hist(residual,
+     main="HISTOGRAM SISAAN",
+     xlab="RESIDUAL",
+     xlim=c(-10,15),ylim=c(0,15),
+     col="darkmagenta",
+     freq=T) 
+yfit=dnorm(xfit,mean=mean(residual),,sd=sd(residual))
+yfit=yfit*diff(Z$mids[1:2])*length(residual)
+lines(xfit,yfit)
+lines(xfit,yfit, col=2, lwd=4)
+
+# Membuat dotplot
+dotchart(residual, labels=row.names(regresi),
+         cex = 0.6, xlab = "residual")
+
+stripchart(residual)
+stripchart(residual, method='stack')
+stripchart(residual, method = 'stack',
+           at = c(0.05),
+           pch = 20, cex = 2,
+           las = 1,
+           frame.plot = T,
+           xlim = c(-10,15),
+           col="darkmagenta",
+           main = "Dotplot Dari Nilai residual")
+
+
+library(foreign)
+stripchart(as.numeric(residual), method = "Regresi", pch = 1)
+
+residual <- qqline(resid(regresi))
+residual
+plot(x = dataku$x1, y = dataku$y, pch = 19, cex = 0.8, frame = FALSE, main="Scatterplot x1 VS y", xlab = "Tekanan darah", ylab = "Kadar Gula",)
+
+# membuat historam
+mydata <- data$y
+hist(mydata)
+hist(mydata, main="HISTOGRAM SISAAN", xlab="RESIDUAL", xlim=c(0,15), col="darkmagenta", freq=T)
+
+#uji sisaan vs y duga
+datakuu <- read.delim('clipboard')
+datakuu
+urutan <- c(1:30)
+urutan
+p1 <- ggplot(datakuu, main="Scatterplot sisaan vs y duga", aes(x=y,duga, y=residuaal)) + 
+  geom_point( color="#69b3a2") +
+  theme_ipsum()
+
+p2 <- ggplot(datakuu, aes(x=y.duga, y=residuaal)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+  theme_ipsum()
+
+p3 <- ggplot(datakuu, aes(x=y.duga, y=residuaal)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=T) +
+  theme_ipsum()
+
+p3
+p2
+p1
+
+#uji Anova, Uji asumsi klasik
+anva <- read.delim('clipboard')
+anva
+model <- lm(residuaal~x1+x2, data = anva)
+shapiro.test(model$residuals)
+# heterekosdetisitas
+library(lmtest)
+bptest(model)
+
+
